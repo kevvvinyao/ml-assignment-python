@@ -7,9 +7,10 @@ input_layer_size = 400
 num_labels = 10
 data = loadmat(os.path.join('Data', 'ex3data1.mat'))
 X, y = data['X'], data['y'].ravel()
-y[y == 10] = 0
+y[y == 10] = 0  # Change element with value'10' to value'0'
 m = y.size
 lambda_ = 0.1
+
 
 def sigmoid(z):
     return 1.0 / (1.0 + np.exp(-z))
@@ -21,12 +22,17 @@ def lrCostFunction(theta, X, y, lambda_):
         y = y.astype(int)
     J = 0
     grad = np.zeros(theta.shape)
+    '''
+    First, we calculate the cost function J, 
+    and add regularization term. 
+    '''
     h = sigmoid(X @ theta)
     j = -y * np.log(h) - (1 - y) * np.log(1 - h)
     J = np.sum(j) / m
-
     J += np.sum(theta[1:] ** 2) * lambda_ / (2 * m)
-
+    '''
+    Secondly, calculate the gradient and add the regularization term
+    '''
     grad = np.transpose(X) @ (h - y) / m
     temp = theta
     temp[0] = 0
@@ -75,20 +81,14 @@ def oneVsAll(X, y, num_labels, lambda_):
                                 options=options)
 
         all_theta[c] = res.x
-
-    # ============================================================
     return all_theta
+
 
 def predictOneVsAll(all_theta, X):
     m = X.shape[0]
     num_labels = all_theta.shape[0]
-
-    # You need to return the following variables correctly
     p = np.zeros(m)
-
-    # Add ones to the X data matrix
     X = np.concatenate([np.ones((m, 1)), X], axis=1)
-
     # ====================== YOUR CODE HERE ======================
     # P = np.zeros((num_labels, m))
     # for i in range(10):
@@ -97,19 +97,17 @@ def predictOneVsAll(all_theta, X):
     #     max_index = np.argmax(P[:, i])
     #     p[i] = max_index
     p = np.argmax(sigmoid(X.dot(all_theta.T)), axis=1)
-
-    # ============================================================
     return p
 
 
+# Task 1.
 # parameters to test
 theta_t = np.array([-2, -1, 1, 2], dtype=float)
 X_t = np.concatenate([np.ones((5, 1)), np.arange(1, 16).reshape(5, 3, order='F') / 10.0], axis=1)
 y_t = np.array([1, 0, 1, 0, 1])
 lambda_t = 3
-
-J, grad = lrCostFunction(theta_t, X_t, y_t, lambda_t)
 # use test parameters to check function for cost and gradient
+J, grad = lrCostFunction(theta_t, X_t, y_t, lambda_t)
 print('Cost         : {:.6f}'.format(J))
 print('Expected cost: 2.534819')
 print('-----------------------')
@@ -117,9 +115,9 @@ print('Gradients:')
 print(' [{:.6f}, {:.6f}, {:.6f}, {:.6f}]'.format(*grad))
 print('Expected gradients:')
 print(' [0.146561, -0.548558, 0.724722, 1.398003]')
-
-
+# Task 2
 all_theta = oneVsAll(X, y, num_labels, lambda_)
+# Task 3
 pred = predictOneVsAll(all_theta, X)
 print('Training Set Accuracy: {:.2f}%'.format(np.mean(pred == y) * 100))
 print('Expected Accuracy: 95.1%')
