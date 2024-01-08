@@ -87,6 +87,23 @@ def predictOneVsAll(all_theta, X):
     return p
 
 
+def predict(Theta1, Theta2, X):
+    if X.ndim == 1:
+        X = X[None]  # promote to 2-dimensions
+    m = X.shape[0]
+    num_labels = Theta2.shape[0]
+    p = np.zeros(X.shape[0])
+    Xb = np.concatenate([np.ones((m, 1)), X], axis=1)
+    Z2 = Xb.dot(Theta1.T)  # Z2 is m x 25
+    A2 = sigmoid(Z2)
+    A2 = np.concatenate([np.ones((m, 1)), A2], axis=1)  # A2 is m x 26
+    Z3 = A2.dot(Theta2.T)
+    A3 = sigmoid(Z3)
+    # A3 is m x 10
+    p = np.argmax(A3, axis=1)
+    return p
+
+
 # Task 1.
 # parameters to test
 print("Task 1: Regularized Logistic Regression")
@@ -104,7 +121,6 @@ print(' [{:.6f}, {:.6f}, {:.6f}, {:.6f}]'.format(*grad))
 print('Expected gradients:')
 print(' [0.146561, -0.548558, 0.724722, 1.398003]')
 print('-----------------------')
-
 # Task 2
 print("Task 2: One-vs-all classifier training")
 all_theta = oneVsAll(X, y, num_labels, lambda_)
@@ -116,3 +132,13 @@ print('Training Set Accuracy: {:.2f}%'.format(np.mean(pred == y) * 100))
 print('Expected Accuracy: 95.1%')
 print('-----------------------')
 # Task 4
+print("Task 4: Neural Network Prediction Function")
+input_layer_size = 400  # 20x20 Input Images of Digits
+hidden_layer_size = 25   # 25 hidden units
+num_labels = 10
+weights = loadmat(os.path.join('Data', 'ex3weights.mat'))
+Theta1, Theta2 = weights['Theta1'], weights['Theta2']
+Theta2 = np.roll(Theta2, 1, axis=0)
+pred = predict(Theta1, Theta2, X)
+print('Training Set Accuracy: {:.1f}%'.format(np.mean(pred == y) * 100))
+print('Expected Accuracy: 97.5%')
