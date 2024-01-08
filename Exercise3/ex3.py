@@ -41,13 +41,8 @@ def lrCostFunction(theta, X, y, lambda_):
 
 
 def oneVsAll(X, y, num_labels, lambda_):
-    # Some useful variables
     m, n = X.shape  # 5000 * 400
-
-    # You need to return the following variables correctly
     all_theta = np.zeros((num_labels, n + 1))  # 10 * 401
-
-    # Add ones to the X data matrix
     X = np.concatenate([np.ones((m, 1)), X], axis=1)
 
     '''
@@ -86,22 +81,15 @@ def oneVsAll(X, y, num_labels, lambda_):
 
 def predictOneVsAll(all_theta, X):
     m = X.shape[0]
-    num_labels = all_theta.shape[0]
     p = np.zeros(m)
     X = np.concatenate([np.ones((m, 1)), X], axis=1)
-    # ====================== YOUR CODE HERE ======================
-    # P = np.zeros((num_labels, m))
-    # for i in range(10):
-    #     P[i, :] = utils.sigmoid(X @ all_theta[i, :])
-    # for i in range(m):
-    #     max_index = np.argmax(P[:, i])
-    #     p[i] = max_index
     p = np.argmax(sigmoid(X.dot(all_theta.T)), axis=1)
     return p
 
 
 # Task 1.
 # parameters to test
+print("Task 1: Regularized Logistic Regression")
 theta_t = np.array([-2, -1, 1, 2], dtype=float)
 X_t = np.concatenate([np.ones((5, 1)), np.arange(1, 16).reshape(5, 3, order='F') / 10.0], axis=1)
 y_t = np.array([1, 0, 1, 0, 1])
@@ -115,9 +103,16 @@ print('Gradients:')
 print(' [{:.6f}, {:.6f}, {:.6f}, {:.6f}]'.format(*grad))
 print('Expected gradients:')
 print(' [0.146561, -0.548558, 0.724722, 1.398003]')
+print('-----------------------')
+
 # Task 2
+print("Task 2: One-vs-all classifier training")
 all_theta = oneVsAll(X, y, num_labels, lambda_)
+print('-----------------------')
 # Task 3
+print("Task 3: One-vs-all classifier prediction")
 pred = predictOneVsAll(all_theta, X)
 print('Training Set Accuracy: {:.2f}%'.format(np.mean(pred == y) * 100))
 print('Expected Accuracy: 95.1%')
+print('-----------------------')
+# Task 4
